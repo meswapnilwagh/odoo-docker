@@ -1,0 +1,44 @@
+version: "3.5"
+services:
+  odoo:
+    build: service/odoo
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    tty: true
+    command: -- --dev=reload
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo
+    volumes:
+      - odoo-web-data:/var/lib/odoo
+      - ./config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      PGDATA: /data/postgres
+    volumes:
+      - postgres_data:/data/postgres
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: odoo@local.com
+      PGADMIN_DEFAULT_PASSWORD: odoo
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  odoo-web-data:

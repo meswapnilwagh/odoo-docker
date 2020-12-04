@@ -1,0 +1,3 @@
+pypeg2
+requests
+debugpy
