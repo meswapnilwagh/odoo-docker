@@ -1,7 +1,11 @@
 version: "3.5"
 services:
   odoo:
-    build: service/odoo
+    build:
+      context: ./service/odoo
+      dockerfile: Dockerfile
+      args:
+        ODOO_IMAGE: "odoo:${ODOO_VERSION}"
     depends_on:
       - db
     ports:
@@ -10,8 +14,8 @@ services:
     command: -- --dev=reload
     environment:
       - HOST=db
-      - USER=odoo
-      - PASSWORD=odoo
+      - USER=${DB_USER}
+      - PASSWORD=${DB_PASSWORD}
     volumes:
       - odoo-web-data:/var/lib/odoo
       - ./config:/etc/odoo
@@ -20,8 +24,8 @@ services:
   db:
     image: postgres:12
     environment:
-      POSTGRES_USER: odoo
-      POSTGRES_PASSWORD: odoo
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
       PGDATA: /data/postgres
     volumes:
       - postgres_data:/data/postgres
@@ -31,8 +35,8 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: odoo@local.com
-      PGADMIN_DEFAULT_PASSWORD: odoo
+      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_USER}"
+      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_PASSWORD}"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     ports:
